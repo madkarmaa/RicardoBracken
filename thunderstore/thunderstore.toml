@@ -4,7 +4,7 @@ schemaVersion = "0.0.1"
 [package]
 namespace = "madkarma"
 name = "RicardoBracken"
-versionNumber = "1.0.3"
+versionNumber = "1.0.4"
 description = "Get your neck snapped by a legend"
 websiteUrl = "https://github.com/madkarmaa/RicardoBracken"
 containsNsfwContent = false
@@ -20,6 +20,14 @@ outdir = "../build"
 
 [[build.copy]]
 source = "./madkarma.RicardoBracken.dll"
+target = "./plugin/"
+
+[[build.copy]]
+source = "./models"
+target = "./plugin/"
+
+[[build.copy]]
+source = "./audios"
 target = "./plugin/"
 
 
