@@ -1,0 +1,85 @@
+name: Build and Release
+
+on:
+    push:
+        branches: [main]
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+jobs:
+    build-and-release:
+        runs-on: windows-latest
+        if: ${{ !contains(github.event.head_commit.message, 'skip build') }}
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Setup .NET 7
+              uses: actions/setup-dotnet@v3
+              with:
+                  dotnet-version: 7.0.407
+
+            - name: Install Thunderstore CLI
+              run: dotnet tool install -g tcli
+
+            - name: Generate manifest
+              run: |
+                  cd thunderstore
+                  tcli build
+                  $zipFile = Get-ChildItem -Path "../build" -Filter "*.zip"
+                  $zipFile = $zipFile.Name
+                  7z x "../build/$zipFile" manifest.json -y
+                  cd ..
+              shell: powershell
+
+            - name: Get manifest data
+              id: get_manifest_data
+              run: |
+                  $manifest = Get-Content "./thunderstore/manifest.json" | ConvertFrom-Json
+                  $name = $manifest.name
+                  $description = $manifest.description
+                  $version = $manifest.version_number
+                  $deps = $manifest.dependencies
+                  $website = $manifest.website_url
+                  echo "name=$name" >> $env:GITHUB_OUTPUT
+                  echo "description=$description" >> $env:GITHUB_OUTPUT
+                  echo "version=$version" >> $env:GITHUB_OUTPUT
+                  echo "deps=$deps" >> $env:GITHUB_OUTPUT
+                  echo "website=$website" >> $env:GITHUB_OUTPUT
+              shell: powershell
+
+            - name: Create version tag
+              run: |
+                  git config --global user.name 'github-actions'
+                  git config --global user.email 'github-actions@github.com'
+                  git tag v${{ steps.get_manifest_data.outputs.version }}
+                  git push origin v${{ steps.get_manifest_data.outputs.version }}
+
+            - name: Build solution
+              run: dotnet build
+
+            - name: Create release
+              id: create_release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: v${{ steps.get_manifest_data.outputs.version }}
+                  release_name: v${{ steps.get_manifest_data.outputs.version }}
+                  draft: false
+                  prerelease: false
+
+            - name: Publish to Thunderstore
+              run: |
+                  cd thunderstore
+                  tcli publish --token ${{ secrets.THUNDERSTORE_TOKEN }}
+
+            - name: Upload mod zip to release
+              uses: AButler/upload-release-assets@v3.0
+              with:
+                  files: 'build/*.zip'
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  release-tag: v${{ steps.get_manifest_data.outputs.version }}
