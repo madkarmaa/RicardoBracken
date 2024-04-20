@@ -17,9 +17,6 @@ icon = "./icon.png"
 readme = "./README.md"
 outdir = "../build"
 
-[[build.copy]]
-source = "./assets"
-target = "./plugin/assets/"
 
 [[build.copy]]
 source = "./madkarma.RicardoBracken.dll"
