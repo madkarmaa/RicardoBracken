@@ -7,6 +7,8 @@ thunderstore/*.dll
 thunderstore/assets/
 build/
 *.blend1
+audios
+models
 
 # User-specific files
 *.rsuser

@@ -54,8 +54,8 @@ namespace RicardoBracken
             string location = Instance.Info.Location;
             location = location.TrimEnd((MyPluginInfo.PLUGIN_GUID + ".dll").ToCharArray());
 
-            AssetBundle sfxBundle = AssetBundle.LoadFromFile(location + "assets/audios");
-            AssetBundle modelsBundle = AssetBundle.LoadFromFile(location + "assets/models");
+            AssetBundle sfxBundle = AssetBundle.LoadFromFile(location + "audios");
+            AssetBundle modelsBundle = AssetBundle.LoadFromFile(location + "models");
 
             if (sfxBundle != null)
             {
