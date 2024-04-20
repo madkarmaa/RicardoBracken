@@ -4,7 +4,7 @@ schemaVersion = "0.0.1"
 [package]
 namespace = "madkarma"
 name = "RicardoBracken"
-versionNumber = "1.0.0"
+versionNumber = "1.0.1"
 description = "Get your neck snapped by a legend"
 websiteUrl = "https://github.com/madkarmaa/RicardoBracken"
 containsNsfwContent = false
